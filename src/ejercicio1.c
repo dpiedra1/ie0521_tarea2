@@ -39,15 +39,15 @@ int main(int argc, char *argv[]){
     // get this values again.
     // In this case vector size is the same as column size, since we suppose
     // that this is a multiplication of matrix by column vector
-    int num_rows = sizeof(vector)/sizeof(float);
-    int num_row = sizeof(matrix) / sizeof(matrix[0]);
+    int num_cols = sizeof(vector)/sizeof(float);
+    int num_rows = sizeof(matrix) / sizeof(matrix[0]);
 
     // Broadcast vector and matrix size
+    MPI_Bcast(&num_cols, 1, MPI_INT, root, comm);
     MPI_Bcast(&num_rows, 1, MPI_INT, root, comm);
-    MPI_Bcast(&num_row, 1, MPI_INT, root, comm);
 
     // Broadcast vector
-    MPI_Bcast(vector, num_rows, MPI_FLOAT, root, comm);
+    MPI_Bcast(vector, num_cols, MPI_FLOAT, root, comm);
 
     int answer;
     float result_value;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
     // That is why we use tags. Sometimes is sayed that tags are optional, but
     // in this case they are not. If we use the same tag (for example 0) then
     // most of the times nothing works.
-    for(int row_number=0; row_number<num_row;row_number++){
+    for(int row_number=0; row_number<num_rows;row_number++){
       MPI_Recv(&answer,1, MPI_INT, MPI_ANY_SOURCE, 0, comm, &status);
 
       // Send a message with row number of the matrix (value different from -1)
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
       MPI_Send(&message, 1, MPI_INT, status.MPI_SOURCE, 1, comm);
 
       // Send row
-      MPI_Send(matrix[row_number], num_rows, MPI_FLOAT, status.MPI_SOURCE, 2, comm);
+      MPI_Send(matrix[row_number], num_cols, MPI_FLOAT, status.MPI_SOURCE, 2, comm);
 
       // Receive result
       MPI_Recv(&result_value,1, MPI_FLOAT, MPI_ANY_SOURCE, 3, comm, &status);
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]){
 
     // Print result
     printf("Printing result...\n");
-    for(int i =0; i<num_row; i++){
-      if(i != num_row-1){
+    for(int i =0; i<num_rows; i++){
+      if(i != num_rows-1){
         printf("%f, ", result[i]);
       }
       else{
@@ -95,19 +95,19 @@ int main(int argc, char *argv[]){
     printf("\n");
 
   }else{
-    int num_rows, num_row;
+    int num_cols, num_rows;
     // Receive vector and matrix size
+    MPI_Bcast(&num_cols, 1, MPI_INT, root, comm);
     MPI_Bcast(&num_rows, 1, MPI_INT, root, comm);
-    MPI_Bcast(&num_row, 1, MPI_INT, root, comm);
 
     // Receive vector
     float *vector;
-    vector = (float *)malloc(num_rows*sizeof(float));
-    MPI_Bcast(vector, num_rows, MPI_FLOAT, root, comm);
+    vector = (float *)malloc(num_cols*sizeof(float));
+    MPI_Bcast(vector, num_cols, MPI_FLOAT, root, comm);
 
     // Allocate memory for specific row
     float *row;
-    row = (float *)malloc(num_rows*sizeof(float));
+    row = (float *)malloc(num_cols*sizeof(float));
 
     int answer;
     int message = 1;
@@ -121,11 +121,11 @@ int main(int argc, char *argv[]){
         break;
       }else{
         // Receive row
-        MPI_Recv(row, num_rows, MPI_FLOAT, 0, 2, comm, MPI_STATUS_IGNORE);
+        MPI_Recv(row, num_cols, MPI_FLOAT, 0, 2, comm, MPI_STATUS_IGNORE);
 
         // Calculate result
         float result_entry = 0;
-        for(int i=0;i<num_rows; i++){
+        for(int i=0;i<num_cols; i++){
           result_entry = result_entry + row[i]*vector[i];
         }
         // Send result
