@@ -264,9 +264,16 @@ int main(int argc, char *argv[]){
 
     // Allocate memory for result
     weight = (int *)malloc(recvcount*sizeof(int));
+
+    // Calculate weight
     for(int i=0; i<recvcount; i++){
-      // FIXME:
-      weight[i] = calculate_weight(graph_1d,result,num_permutations);
+      int *permutation = (int*)malloc(size*sizeof(int));
+      int permute_index = recvbuf[i];
+      for(int j=0; j<size; j++){
+        permutation[j] = permutations[permute_index*size + j];
+      }
+      weight[i] = calculate_weight(graph_1d, permutation, size);
+      free(permutation);
     }
 
     // Allocate memory to receive data
@@ -275,6 +282,22 @@ int main(int argc, char *argv[]){
     // Receive result
     MPI_Gatherv(weight, recvcount, MPI_INT, final_result, sendcounts, displs,
                 MPI_INT, root, comm);
+
+    // Find the smallest path
+    int smallest_index = 0;
+    for(int i=1; i<num_permutations; i++){
+        if(final_result[i] < final_result[smallest_index]){
+          smallest_index = i;
+        }
+    }
+
+    // Print smallest weight and its permutation
+    printf("The smallest path is: %d in permutation: \n",
+           final_result[smallest_index]);
+    for(int i=0;i<size-1; i++){
+      printf("%d-", permutations[smallest_index*size + i]);
+    }
+    printf("%d\n", permutations[smallest_index*size + size-1]);
 
     // Free memory
     free(graph_1d);
@@ -347,17 +370,13 @@ int main(int argc, char *argv[]){
 
     // Calculate weight
     for(int i=0; i<recvcount; i++){
-     // FIXME
-     weight[i] = calculate_weight(NULL,NULL,0);
-    }
-
-    if(rank == 1){
-      for(int i=0; i<size; i++){
-        for(int j=0; j<size; j++){
-          printf("%d,", graph_1d[i*size + j]);
-        }
-        printf("\n");
+      int *permutation = (int*)malloc(size*sizeof(int));
+      int permute_index = recvbuf[i];
+      for(int j=0; j<size; j++){
+        permutation[j] = permutations[permute_index*size + j];
       }
+      weight[i] = calculate_weight(graph_1d, permutation, size);
+      free(permutation);
     }
 
     MPI_Gatherv(weight, recvcount, MPI_INT, NULL, sendcounts, displs,
