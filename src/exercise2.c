@@ -33,7 +33,6 @@ int calculate_weight(int *graph_1d, int *permutation, int size){
    for (int i = 0; i < size-1; i++) {
      Next_permutation = permutation[i+1];
      graph_pointer = permutation[i]*size + Next_permutation;
-     printf("graph_pointer: %d\n", graph_pointer);
      weight = weight + graph_1d[graph_pointer];
    }
 
