@@ -7,18 +7,17 @@ all:
 	# Sequential code
 	gcc -Wall src/exercise1_sec.c -o exercise1_sec
 	gcc -Wall src/TPS.c -o exercise2_sec
-	gcc -Wall src/Generate_primes.c -o exercise3_sec
+	gcc -Wall src/Generate_primes.c -lm -o exercise3_sec
 
 run:
 	mpiexec -n 4 ./exercise1
 	mpiexec -n 4 ./exercise2
-	mpiexec -n 4 ./exercise3
-	./exercise1_sec
+	mpiexec -n 4 ./exercise3 
 
 sec:
 	gcc -Wall src/exercise1_sec.c -o exercise1_sec
 	gcc -Wall src/TPS.c -o exercise2_sec
-	gcc -Wall src/Generate_primes.c -o exercise3_sec
+	gcc -Wall src/Generate_primes.c -lm -o exercise3_sec -lm
 
 
 clean:
