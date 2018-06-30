@@ -7,7 +7,7 @@
 
 int main (int argc, char **argv)
 {
-  int rank, ierr, size, branch, count_primes;
+  int rank, ierr, size, count_primes;
   double start, end;
   FILE* file;
   count_primes = 0;
