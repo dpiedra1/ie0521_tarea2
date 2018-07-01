@@ -25,7 +25,6 @@
                      8. Since the graph is a square matrix then size is also
                      the number of columns and rows of this matrix.
 */
-// TODO: Finish this function
 int calculate_weight(int *graph_1d, int *permutation, int size){
    int graph_pointer, Next_permutation;
    int weight = 0;
@@ -58,7 +57,7 @@ int factorial(int n)
 }
 
 /*
-      This function swaps to values in an array
+      This function swaps two values in an array
                           ********Input parameters********
       i:             Index in array to swap with j
       j:             Index in array to swap with i
@@ -126,6 +125,10 @@ void permute(int *array, int size, int **result, int *result_index, int first_in
 
 }
 
+/*
+              Main
+
+*/
 int main(int argc, char *argv[]){
 
   int rank, total_processes;
@@ -160,9 +163,18 @@ int main(int argc, char *argv[]){
                        { 75,  100, 83,  91,  236, 55,  141, 0   }
                       };
 
+    // Define array of names
+    char names[8][50] = {"San Jose", "Limon", "San Francisco", "Alajuela",
+                         "Liberia", "Paraiso", "Puntarenas", "San Isidro"};
+
+    // Size of graph
+    int size = sizeof(graph[0])/sizeof(int);
+
     // Generate list of indexes
-    int v_t[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    int size = sizeof(v_t)/sizeof(int);
+    int *array_to_permute = (int *)malloc(size*sizeof(int));
+    for(int i=0; i<size; i++){
+      array_to_permute[i] = i;
+    }
 
     // Calculate total number of possible permutations
     int num_permutations = factorial(size);
@@ -176,7 +188,7 @@ int main(int argc, char *argv[]){
     int *ptr_result_index = &result_index;
 
     // Calculate all possible permutations
-    permute(v_t, size, result, ptr_result_index, 0, size-1);
+    permute(array_to_permute, size, result, ptr_result_index, 0, size-1);
 
     // Print all permutations (just for debugging)
     // Uncomment this code to print all permutations
@@ -292,14 +304,17 @@ int main(int argc, char *argv[]){
     }
 
     // Print smallest weight and its permutation
-    printf("The smallest path is: %d in permutation: \n",
+    printf("The smallest path is %d in permutation: \n",
            final_result[smallest_index]);
-    for(int i=0;i<size-1; i++){
-      printf("%d-", permutations[smallest_index*size + i]);
+    for(int i=0;i<size; i++){
+      int city_number = permutations[smallest_index*size + i];
+      printf("%s->", names[city_number]);
     }
-    printf("%d\n", permutations[smallest_index*size + size-1]);
+    // Printing again the first city in permutation
+    printf("%s\n", names[permutations[smallest_index*size]]);
 
     // Free memory
+    free(array_to_permute);
     free(graph_1d);
     free(permutations);
     for(int i=0; i<num_permutations; i++){
