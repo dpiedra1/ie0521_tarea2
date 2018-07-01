@@ -22,12 +22,11 @@
 */
 
 int calculate_weight(int *graph_1d, int *permutation, int size){
-   int graph_pointer, Actual_permutation, Next_permutation;
+   int graph_pointer, Next_permutation;
    int weight = 0;
 
    for (int i = 0; i < size-1; i++) {
      Next_permutation = permutation[i+1];
-     Actual_permutation = permutation[i];
      graph_pointer = permutation[i]*size + Next_permutation;
      weight = weight + graph_1d[graph_pointer];
    }
@@ -135,6 +134,10 @@ int main(int argc, char *argv[]){
                        { 83,  197, 78,  69,  98,  108, 0,   141 },
                        { 75,  100, 83,  91,  236, 55,  141, 0   }
                       };
+      
+     // Define array of names
+      char names[8][50] = {"San Jose", "Limon", "San Francisco", "Alajuela",
+                         "Liberia", "Paraiso", "Puntarenas", "San Isidro"};
 
     // Generate list of indexes
       int v_t[8] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -176,28 +179,12 @@ int main(int argc, char *argv[]){
             }
           }
 
-        for (int i = 0; i < size; i++) {
-          int position = result[smallest_path][i];
-          switch (position) {
-            case 0: {printf("San José-->");
-                    break;}
-            case 1:{ printf("Limón -->");
-                    break;}
-            case 2: {printf("San Francisco-->");
-                    break;}
-            case 3: {printf("Alajuela-->");
-                    break;}
-            case 4: {printf("Liberia-->");
-                    break;}
-            case 5: {printf("Paraíso-->");
-                    break;}
-            case 6: {printf("Puntarenas-->");
-                    break;}
-            case 7: {printf("San Isidro-->");
-                    break;}
-          }
-
-        }
+            for (int i = 0; i < size; i++) {
+            int position = result[smallest_path][i];
+            printf("%s-->", names[position]);
+            }
+        printf("%s\n", names[result[smallest_path][0]]);
+        printf("Smallest weight: %d\n", smallest_weight);
         printf("%d\n", result[smallest_path][0]);
         printf("Smallest weight: %d\n", smallest_weight);
 
